@@ -215,7 +215,6 @@ def test_american_call_equals_european(S: float, K: float, sigma: float):
 @karva.tags.parametrize("K", [95, 100, 105])
 @karva.tags.parametrize("true_vol", [0.15, 0.20, 0.25, 0.30, 0.35])
 @karva.tags.parametrize("T", [0.25, 0.5, 1.0])
-@karva.tags.skip
 def test_implied_vol_recovery_call(S: float, K: float, true_vol: float, T: float):
     """Implied vol should recover the true volatility."""
     r = 0.05
@@ -228,7 +227,6 @@ def test_implied_vol_recovery_call(S: float, K: float, true_vol: float, T: float
 @karva.tags.parametrize("K", [95, 100, 105])
 @karva.tags.parametrize("true_vol", [0.15, 0.20, 0.25, 0.30, 0.35])
 @karva.tags.parametrize("T", [0.25, 0.5, 1.0])
-@karva.tags.skip
 def test_implied_vol_recovery_put(S: float, K: float, true_vol: float, T: float):
     """Implied vol should recover the true volatility for puts."""
     r = 0.05

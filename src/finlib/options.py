@@ -306,7 +306,7 @@ def implied_volatility(
     tolerance: float = 1e-6,
     max_iterations: int = 100,
 ) -> float:
-    """Calculate implied volatility using Newton-Raphson method.
+    """Calculate implied volatility using Newton-Raphson with bisection fallback.
 
     Args:
         option_price: Market price of option
@@ -324,33 +324,48 @@ def implied_volatility(
     if T <= 0:
         return 0.0
 
-    # Initial guess using Brenner-Subrahmanyam approximation
-    sigma = math.sqrt(2 * math.pi / T) * option_price / S
+    if option_price <= 0:
+        return 0.0
 
-    if sigma <= 0:
-        sigma = 0.2  # Default guess
-
-    for _ in range(max_iterations):
+    def price_func(sigma: float) -> float:
         if option_type == "call":
-            price = black_scholes_call(S, K, r, sigma, T)
+            return black_scholes_call(S, K, r, sigma, T)
         else:
-            price = black_scholes_put(S, K, r, sigma, T)
+            return black_scholes_put(S, K, r, sigma, T)
 
-        diff = price - option_price
+    # Use bisection method for robustness
+    # Implied vol is typically between 0.01 and 2.0
+    sigma_low = 0.001
+    sigma_high = 3.0
 
-        if abs(diff) < tolerance:
-            return sigma
+    # Check bounds
+    price_low = price_func(sigma_low)
+    price_high = price_func(sigma_high)
 
-        v = vega(S, K, r, sigma, T)
-        if v == 0:
-            break
+    # If target price is outside our range, return boundary
+    if option_price <= price_low:
+        return sigma_low
+    if option_price >= price_high:
+        return sigma_high
 
-        sigma = sigma - diff / v
+    # Bisection method
+    for _ in range(max_iterations):
+        sigma_mid = (sigma_low + sigma_high) / 2
+        price_mid = price_func(sigma_mid)
 
-        if sigma <= 0:
-            sigma = 0.001
+        if abs(price_mid - option_price) < tolerance:
+            return sigma_mid
 
-    return sigma
+        if price_mid < option_price:
+            sigma_low = sigma_mid
+        else:
+            sigma_high = sigma_mid
+
+        # Check for convergence
+        if sigma_high - sigma_low < tolerance:
+            return sigma_mid
+
+    return (sigma_low + sigma_high) / 2
 
 
 def option_payoff(

@@ -2,7 +2,7 @@
 
 import math
 
-import karva
+import pytest
 
 from finlib.interest import (
     simple_interest,
@@ -20,7 +20,7 @@ from finlib.interest import (
 
 
 # Simple Interest Tests
-@karva.tags.parametrize("principal,rate,time,expected", [
+@pytest.mark.parametrize("principal,rate,time,expected", [
     (1000, 0.05, 1, 50),
     (1000, 0.05, 2, 100),
     (5000, 0.08, 3, 1200),
@@ -32,7 +32,7 @@ def test_simple_interest_basic(principal: float, rate: float, time: float, expec
     assert abs(result - expected) < 0.01
 
 
-@karva.tags.parametrize("principal,rate,time", [
+@pytest.mark.parametrize("principal,rate,time", [
     (0, 0.05, 1),
     (1000, 0, 1),
     (1000, 0.05, 0),
@@ -42,14 +42,14 @@ def test_simple_interest_zero_values(principal: float, rate: float, time: float)
     assert result == 0.0
 
 
-@karva.tags.parametrize("principal", [100, 1000, 10000, 100000, 1000000])
+@pytest.mark.parametrize("principal", [100, 1000, 10000, 100000, 1000000])
 def test_simple_interest_scales_with_principal(principal: float):
     rate, time = 0.05, 1
     result = simple_interest(principal, rate, time)
     assert abs(result - principal * rate * time) < 0.001
 
 
-@karva.tags.parametrize("time", [0.25, 0.5, 1, 2, 5, 10])
+@pytest.mark.parametrize("time", [0.25, 0.5, 1, 2, 5, 10])
 def test_simple_interest_scales_with_time(time: float):
     principal, rate = 1000, 0.05
     result = simple_interest(principal, rate, time)
@@ -57,7 +57,7 @@ def test_simple_interest_scales_with_time(time: float):
 
 
 # Compound Interest Tests
-@karva.tags.parametrize("principal,rate,time,n,expected", [
+@pytest.mark.parametrize("principal,rate,time,n,expected", [
     (1000, 0.05, 1, 1, 1050.00),
     (1000, 0.05, 1, 12, 1051.16),
     (1000, 0.05, 1, 365, 1051.27),
@@ -69,7 +69,7 @@ def test_compound_interest_basic(principal: float, rate: float, time: float, n: 
     assert abs(result - expected) < 0.01
 
 
-@karva.tags.parametrize("n", [1, 2, 4, 12, 52, 365])
+@pytest.mark.parametrize("n", [1, 2, 4, 12, 52, 365])
 def test_compound_interest_frequency_increases_value(n: int):
     principal, rate, time = 1000, 0.10, 1
     result = compound_interest(principal, rate, time, n)
@@ -85,7 +85,7 @@ def test_compound_interest_equals_simple_for_one_year_annual():
     assert abs(compound - simple) < 0.001
 
 
-@karva.tags.parametrize("years", [1, 2, 5, 10, 20, 30])
+@pytest.mark.parametrize("years", [1, 2, 5, 10, 20, 30])
 def test_compound_interest_growth_over_time(years: int):
     principal, rate = 1000, 0.08
     result = compound_interest(principal, rate, years)
@@ -94,7 +94,7 @@ def test_compound_interest_growth_over_time(years: int):
 
 
 # Continuous Compound Interest Tests
-@karva.tags.parametrize("principal,rate,time,expected", [
+@pytest.mark.parametrize("principal,rate,time,expected", [
     (1000, 0.05, 1, 1051.27),
     (1000, 0.10, 1, 1105.17),
     (1000, 0.05, 2, 1105.17),
@@ -114,7 +114,7 @@ def test_continuous_vs_daily_compound():
     assert continuous - daily < 0.1  # Relaxed tolerance
 
 
-@karva.tags.parametrize("rate", [0.01, 0.05, 0.10, 0.15, 0.20])
+@pytest.mark.parametrize("rate", [0.01, 0.05, 0.10, 0.15, 0.20])
 def test_continuous_formula(rate: float):
     principal, time = 1000, 1
     result = continuous_compound_interest(principal, rate, time)
@@ -123,7 +123,7 @@ def test_continuous_formula(rate: float):
 
 
 # APR/APY Conversion Tests
-@karva.tags.parametrize("apr,n,expected_apy", [
+@pytest.mark.parametrize("apr,n,expected_apy", [
     (0.05, 12, 0.05116),
     (0.10, 12, 0.10471),
     (0.05, 4, 0.05095),
@@ -135,7 +135,7 @@ def test_apr_to_apy(apr: float, n: int, expected_apy: float):
     assert abs(result - expected_apy) < 0.0001
 
 
-@karva.tags.parametrize("apy,n", [
+@pytest.mark.parametrize("apy,n", [
     (0.05, 12),
     (0.10, 12),
     (0.05, 4),
@@ -153,14 +153,14 @@ def test_apr_equals_apy_for_annual():
     assert abs(apy - apr) < 0.00001
 
 
-@karva.tags.parametrize("apr", [0.01, 0.05, 0.10, 0.15])
+@pytest.mark.parametrize("apr", [0.01, 0.05, 0.10, 0.15])
 def test_apy_greater_than_apr(apr: float):
     apy = apr_to_apy(apr, 12)
     assert apy > apr
 
 
 # Effective Interest Rate Tests
-@karva.tags.parametrize("nominal,n,expected", [
+@pytest.mark.parametrize("nominal,n,expected", [
     (0.05, 12, 0.05116),
     (0.10, 4, 0.10381),
     (0.08, 2, 0.08160),
@@ -179,7 +179,7 @@ def test_effective_rate_equals_apy():
 
 
 # Future Value Tests
-@karva.tags.parametrize("principal,rate,time,n,expected", [
+@pytest.mark.parametrize("principal,rate,time,n,expected", [
     (1000, 0.05, 1, 1, 1050.00),
     (1000, 0.05, 10, 1, 1628.89),
     (5000, 0.08, 5, 12, 7449.23),
@@ -190,7 +190,7 @@ def test_future_value(principal: float, rate: float, time: float, n: int, expect
 
 
 # Present Value Tests
-@karva.tags.parametrize("fv,rate,time,n,expected_pv", [
+@pytest.mark.parametrize("fv,rate,time,n,expected_pv", [
     (1050, 0.05, 1, 1, 1000.00),
     (1628.89, 0.05, 10, 1, 1000.00),
 ])
@@ -207,7 +207,7 @@ def test_pv_fv_roundtrip():
 
 
 # Real Interest Rate Tests
-@karva.tags.parametrize("nominal,inflation,expected", [
+@pytest.mark.parametrize("nominal,inflation,expected", [
     (0.05, 0.02, 0.0294),
     (0.10, 0.03, 0.0680),
     (0.08, 0.08, 0.0000),
@@ -225,7 +225,7 @@ def test_real_rate_negative_when_inflation_higher():
 
 
 # Doubling Time Tests
-@karva.tags.parametrize("rate,expected_years", [
+@pytest.mark.parametrize("rate,expected_years", [
     (0.07, 10.24),
     (0.10, 7.27),
     (0.05, 14.21),
@@ -250,7 +250,7 @@ def test_doubling_time_rule_of_72_approximation():
 
 
 # Compound Interest Earned Tests
-@karva.tags.parametrize("principal,rate,time,n,expected", [
+@pytest.mark.parametrize("principal,rate,time,n,expected", [
     (1000, 0.05, 1, 1, 50.00),
     (1000, 0.05, 1, 12, 51.16),
     (1000, 0.10, 2, 1, 210.00),

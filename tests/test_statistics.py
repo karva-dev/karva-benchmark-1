@@ -2,8 +2,7 @@
 
 import math
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.statistics import (
     mean,
@@ -33,7 +32,7 @@ from finlib.statistics import (
 
 
 # Mean Tests
-@karva.tags.parametrize("data,expected", [
+@pytest.mark.parametrize("data,expected", [
     ([1, 2, 3, 4, 5], 3),
     ([10, 20, 30], 20),
     ([0, 0, 0], 0),
@@ -59,7 +58,7 @@ def test_mean_single():
 
 
 # Variance Tests
-@karva.tags.parametrize("data,ddof,expected", [
+@pytest.mark.parametrize("data,ddof,expected", [
     ([1, 2, 3, 4, 5], 0, 2),
     ([1, 2, 3, 4, 5], 1, 2.5),
     ([0, 0, 0], 0, 0),
@@ -79,7 +78,7 @@ def test_variance_insufficient_data():
 
 
 # Standard Deviation Tests
-@karva.tags.parametrize("data,ddof,expected", [
+@pytest.mark.parametrize("data,ddof,expected", [
     ([1, 2, 3, 4, 5], 0, 1.4142),
     ([2, 4, 4, 4, 5, 5, 7, 9], 0, 2),
 ])
@@ -109,7 +108,7 @@ def test_covariance_opposite():
     assert result < 0
 
 
-@karva.tags.parametrize("x,y,expected", [
+@pytest.mark.parametrize("x,y,expected", [
     ([1, 2, 3], [1, 2, 3], 0.6667),
     ([1, 2, 3], [3, 2, 1], -0.6667),
 ])
@@ -196,7 +195,7 @@ def test_correlation_matrix_bounds():
 
 
 # Rolling Mean Tests
-@karva.tags.parametrize("window", [2, 3, 5])
+@pytest.mark.parametrize("window", [2, 3, 5])
 def test_rolling_mean_length(window: int):
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     result = rolling_mean(data, window)
@@ -220,7 +219,7 @@ def test_rolling_mean_window_too_large():
 
 
 # Rolling Std Tests
-@karva.tags.parametrize("window", [3, 5, 10])
+@pytest.mark.parametrize("window", [3, 5, 10])
 def test_rolling_std_length(window: int):
     data = list(range(20))
     result = rolling_std(data, window)
@@ -253,7 +252,7 @@ def test_ewma_alpha_one():
     assert result == data
 
 
-@karva.tags.parametrize("alpha", [0.1, 0.3, 0.5, 0.9])
+@pytest.mark.parametrize("alpha", [0.1, 0.3, 0.5, 0.9])
 def test_ewma_various_alpha(alpha: float):
     data = [1, 2, 3, 4, 5]
     result = ewma(data, alpha)
@@ -329,7 +328,7 @@ def test_kurtosis_insufficient_data():
 
 
 # Percentile Tests
-@karva.tags.parametrize("data,p,expected", [
+@pytest.mark.parametrize("data,p,expected", [
     ([1, 2, 3, 4, 5], 0, 1),
     ([1, 2, 3, 4, 5], 100, 5),
     ([1, 2, 3, 4, 5], 50, 3),
@@ -425,7 +424,7 @@ def test_zscore_outliers_found():
     assert 5 in result  # Index of 100
 
 
-@karva.tags.parametrize("threshold", [2.0, 2.5, 3.0])
+@pytest.mark.parametrize("threshold", [2.0, 2.5, 3.0])
 def test_zscore_outliers_thresholds(threshold: float):
     data = [1, 2, 3, 4, 5, 50]
     result = zscore_outliers(data, threshold=threshold)
@@ -445,7 +444,7 @@ def test_iqr_outliers_found():
     assert 9 in result  # Index of 100
 
 
-@karva.tags.parametrize("k", [1.5, 2.0, 3.0])
+@pytest.mark.parametrize("k", [1.5, 2.0, 3.0])
 def test_iqr_outliers_multiplier(k: float):
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 50]
     result = iqr_outliers(data, k=k)
@@ -453,7 +452,7 @@ def test_iqr_outliers_multiplier(k: float):
 
 
 # Weighted Mean Tests
-@karva.tags.parametrize("data,weights,expected", [
+@pytest.mark.parametrize("data,weights,expected", [
     ([1, 2, 3], [1, 1, 1], 2),
     ([1, 2, 3], [1, 2, 1], 2),
     ([10, 20, 30], [0.5, 0.3, 0.2], 17),  # (10*0.5 + 20*0.3 + 30*0.2) / (0.5+0.3+0.2) = 17
@@ -480,7 +479,7 @@ def test_weighted_mean_zero_weights():
 
 
 # Geometric Mean Tests
-@karva.tags.parametrize("data,expected", [
+@pytest.mark.parametrize("data,expected", [
     ([1, 1, 1], 1),
     ([2, 8], 4),
     ([1, 2, 4, 8], 2.828),
@@ -507,7 +506,7 @@ def test_geometric_mean_empty():
 
 
 # Harmonic Mean Tests
-@karva.tags.parametrize("data,expected", [
+@pytest.mark.parametrize("data,expected", [
     ([1, 1, 1], 1),
     ([1, 2, 4], 1.714),
     ([2, 3, 6], 3),

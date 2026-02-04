@@ -3,7 +3,7 @@
 import math
 import random
 
-import karva
+import pytest
 
 from finlib.statistics import (
     mean,
@@ -43,9 +43,9 @@ def generate_positive_data(n: int, mean_val: float, std_val: float, seed: int) -
 
 
 # Mean tests
-@karva.tags.parametrize("n", [10, 50, 100, 500])
-@karva.tags.parametrize("mean_val", [-10, 0, 10, 100])
-@karva.tags.parametrize("std_val", [1, 5, 10])
+@pytest.mark.parametrize("n", [10, 50, 100, 500])
+@pytest.mark.parametrize("mean_val", [-10, 0, 10, 100])
+@pytest.mark.parametrize("std_val", [1, 5, 10])
 def test_mean_converges(n: int, mean_val: float, std_val: float):
     """Mean should converge to true mean for large n."""
     data = generate_data(n, mean_val, std_val, 42)
@@ -56,9 +56,9 @@ def test_mean_converges(n: int, mean_val: float, std_val: float):
 
 
 # Variance tests
-@karva.tags.parametrize("n", [20, 50, 100, 500])
-@karva.tags.parametrize("std_val", [1, 5, 10, 20])
-@karva.tags.parametrize("ddof", [0, 1])
+@pytest.mark.parametrize("n", [20, 50, 100, 500])
+@pytest.mark.parametrize("std_val", [1, 5, 10, 20])
+@pytest.mark.parametrize("ddof", [0, 1])
 def test_variance_positive(n: int, std_val: float, ddof: int):
     """Variance should be positive."""
     data = generate_data(n, 0, std_val, 42)
@@ -66,9 +66,9 @@ def test_variance_positive(n: int, std_val: float, ddof: int):
     assert var >= 0
 
 
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("std_val", [1, 5, 10])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("std_val", [1, 5, 10])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_variance_converges(n: int, std_val: float, seed: int):
     """Variance should converge to true variance for large n."""
     data = generate_data(n, 0, std_val, seed)
@@ -79,9 +79,9 @@ def test_variance_converges(n: int, std_val: float, seed: int):
 
 
 # Standard deviation tests
-@karva.tags.parametrize("n", [20, 50, 100, 500])
-@karva.tags.parametrize("std_val", [1, 5, 10, 20])
-@karva.tags.parametrize("ddof", [0, 1])
+@pytest.mark.parametrize("n", [20, 50, 100, 500])
+@pytest.mark.parametrize("std_val", [1, 5, 10, 20])
+@pytest.mark.parametrize("ddof", [0, 1])
 def test_std_positive(n: int, std_val: float, ddof: int):
     """Standard deviation should be positive."""
     data = generate_data(n, 0, std_val, 42)
@@ -89,9 +89,9 @@ def test_std_positive(n: int, std_val: float, ddof: int):
     assert s >= 0
 
 
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("std_val", [1, 5, 10])
-@karva.tags.parametrize("ddof", [0, 1])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("std_val", [1, 5, 10])
+@pytest.mark.parametrize("ddof", [0, 1])
 def test_std_is_sqrt_variance(n: int, std_val: float, ddof: int):
     """Std should be sqrt of variance."""
     data = generate_data(n, 0, std_val, 42)
@@ -101,9 +101,9 @@ def test_std_is_sqrt_variance(n: int, std_val: float, ddof: int):
 
 
 # Covariance tests
-@karva.tags.parametrize("n", [20, 50, 100])
-@karva.tags.parametrize("std_val", [1, 5, 10])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [20, 50, 100])
+@pytest.mark.parametrize("std_val", [1, 5, 10])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_covariance_self_equals_variance(n: int, std_val: float, seed: int):
     """Covariance of series with itself equals variance."""
     data = generate_data(n, 0, std_val, seed)
@@ -112,9 +112,9 @@ def test_covariance_self_equals_variance(n: int, std_val: float, seed: int):
     assert abs(cov - var) < 0.0001
 
 
-@karva.tags.parametrize("n", [50, 100])
-@karva.tags.parametrize("multiplier", [0.5, 1.0, 2.0, -1.0])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [50, 100])
+@pytest.mark.parametrize("multiplier", [0.5, 1.0, 2.0, -1.0])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_covariance_scaled_series(n: int, multiplier: float, seed: int):
     """Covariance with scaled series."""
     x = generate_data(n, 0, 5, seed)
@@ -126,8 +126,8 @@ def test_covariance_scaled_series(n: int, multiplier: float, seed: int):
 
 
 # Correlation tests
-@karva.tags.parametrize("n", [50, 100, 200])
-@karva.tags.parametrize("seed", [42, 123, 456, 789])
+@pytest.mark.parametrize("n", [50, 100, 200])
+@pytest.mark.parametrize("seed", [42, 123, 456, 789])
 def test_correlation_self_is_one(n: int, seed: int):
     """Correlation of series with itself should be 1."""
     data = generate_data(n, 0, 5, seed)
@@ -135,8 +135,8 @@ def test_correlation_self_is_one(n: int, seed: int):
     assert abs(corr - 1.0) < 0.0001
 
 
-@karva.tags.parametrize("n", [50, 100, 200])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 200])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_correlation_inverse_is_negative_one(n: int, seed: int):
     """Correlation of series with inverse should be -1."""
     data = generate_data(n, 0, 5, seed)
@@ -145,9 +145,9 @@ def test_correlation_inverse_is_negative_one(n: int, seed: int):
     assert abs(corr - (-1.0)) < 0.0001
 
 
-@karva.tags.parametrize("n", [50, 100])
-@karva.tags.parametrize("seed1", [42, 123])
-@karva.tags.parametrize("seed2", [456, 789])
+@pytest.mark.parametrize("n", [50, 100])
+@pytest.mark.parametrize("seed1", [42, 123])
+@pytest.mark.parametrize("seed2", [456, 789])
 def test_correlation_bounds(n: int, seed1: int, seed2: int):
     """Correlation should be between -1 and 1."""
     x = generate_data(n, 0, 5, seed1)
@@ -157,9 +157,9 @@ def test_correlation_bounds(n: int, seed1: int, seed2: int):
 
 
 # Covariance matrix tests
-@karva.tags.parametrize("n", [30, 50, 100])
-@karva.tags.parametrize("num_series", [2, 3, 4])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [30, 50, 100])
+@pytest.mark.parametrize("num_series", [2, 3, 4])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_covariance_matrix_symmetric(n: int, num_series: int, seed: int):
     """Covariance matrix should be symmetric."""
     data = [generate_data(n, 0, 5, seed + i) for i in range(num_series)]
@@ -169,9 +169,9 @@ def test_covariance_matrix_symmetric(n: int, num_series: int, seed: int):
             assert abs(matrix[i][j] - matrix[j][i]) < 0.0001
 
 
-@karva.tags.parametrize("n", [30, 50, 100])
-@karva.tags.parametrize("num_series", [2, 3, 4])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [30, 50, 100])
+@pytest.mark.parametrize("num_series", [2, 3, 4])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_covariance_matrix_diagonal_positive(n: int, num_series: int, seed: int):
     """Diagonal elements (variances) should be positive."""
     data = [generate_data(n, 0, 5, seed + i) for i in range(num_series)]
@@ -181,9 +181,9 @@ def test_covariance_matrix_diagonal_positive(n: int, num_series: int, seed: int)
 
 
 # Correlation matrix tests
-@karva.tags.parametrize("n", [30, 50, 100])
-@karva.tags.parametrize("num_series", [2, 3, 4])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [30, 50, 100])
+@pytest.mark.parametrize("num_series", [2, 3, 4])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_correlation_matrix_diagonal_ones(n: int, num_series: int, seed: int):
     """Diagonal of correlation matrix should be 1."""
     data = [generate_data(n, 0, 5, seed + i) for i in range(num_series)]
@@ -192,9 +192,9 @@ def test_correlation_matrix_diagonal_ones(n: int, num_series: int, seed: int):
         assert abs(matrix[i][i] - 1.0) < 0.0001
 
 
-@karva.tags.parametrize("n", [30, 50, 100])
-@karva.tags.parametrize("num_series", [2, 3, 4])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [30, 50, 100])
+@pytest.mark.parametrize("num_series", [2, 3, 4])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_correlation_matrix_bounds(n: int, num_series: int, seed: int):
     """All correlation matrix elements should be between -1 and 1."""
     data = [generate_data(n, 0, 5, seed + i) for i in range(num_series)]
@@ -205,9 +205,9 @@ def test_correlation_matrix_bounds(n: int, num_series: int, seed: int):
 
 
 # Rolling mean tests
-@karva.tags.parametrize("n", [50, 100, 200])
-@karva.tags.parametrize("window", [5, 10, 20])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [50, 100, 200])
+@pytest.mark.parametrize("window", [5, 10, 20])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_rolling_mean_length(n: int, window: int, seed: int):
     """Rolling mean should have correct length."""
     data = generate_data(n, 0, 5, seed)
@@ -215,9 +215,9 @@ def test_rolling_mean_length(n: int, window: int, seed: int):
     assert len(result) == n - window + 1
 
 
-@karva.tags.parametrize("n", [100])
-@karva.tags.parametrize("window", [5, 10, 20, 30])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [100])
+@pytest.mark.parametrize("window", [5, 10, 20, 30])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_rolling_mean_values(n: int, window: int, seed: int):
     """Rolling mean values should be valid."""
     data = generate_data(n, 0, 5, seed)
@@ -227,9 +227,9 @@ def test_rolling_mean_values(n: int, window: int, seed: int):
 
 
 # Rolling std tests
-@karva.tags.parametrize("n", [50, 100, 200])
-@karva.tags.parametrize("window", [5, 10, 20])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [50, 100, 200])
+@pytest.mark.parametrize("window", [5, 10, 20])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_rolling_std_length(n: int, window: int, seed: int):
     """Rolling std should have correct length."""
     data = generate_data(n, 0, 5, seed)
@@ -237,9 +237,9 @@ def test_rolling_std_length(n: int, window: int, seed: int):
     assert len(result) == n - window + 1
 
 
-@karva.tags.parametrize("n", [100])
-@karva.tags.parametrize("window", [5, 10, 20, 30])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [100])
+@pytest.mark.parametrize("window", [5, 10, 20, 30])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_rolling_std_positive(n: int, window: int, seed: int):
     """Rolling std values should be positive."""
     data = generate_data(n, 0, 5, seed)
@@ -249,9 +249,9 @@ def test_rolling_std_positive(n: int, window: int, seed: int):
 
 
 # EWMA tests
-@karva.tags.parametrize("n", [50, 100, 200])
-@karva.tags.parametrize("alpha", [0.1, 0.3, 0.5, 0.9])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [50, 100, 200])
+@pytest.mark.parametrize("alpha", [0.1, 0.3, 0.5, 0.9])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_ewma_length(n: int, alpha: float, seed: int):
     """EWMA should have same length as input."""
     data = generate_data(n, 0, 5, seed)
@@ -259,9 +259,9 @@ def test_ewma_length(n: int, alpha: float, seed: int):
     assert len(result) == n
 
 
-@karva.tags.parametrize("n", [50, 100])
-@karva.tags.parametrize("alpha", [0.1, 0.3, 0.5, 0.9])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [50, 100])
+@pytest.mark.parametrize("alpha", [0.1, 0.3, 0.5, 0.9])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_ewma_first_equals_first(n: int, alpha: float, seed: int):
     """EWMA first value should equal first data value."""
     data = generate_data(n, 0, 5, seed)
@@ -270,8 +270,8 @@ def test_ewma_first_equals_first(n: int, alpha: float, seed: int):
 
 
 # Skewness tests
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_skewness_symmetric_near_zero(n: int, seed: int):
     """Skewness of symmetric distribution should be near zero."""
     data = generate_data(n, 0, 5, seed)
@@ -279,8 +279,8 @@ def test_skewness_symmetric_near_zero(n: int, seed: int):
     assert abs(sk) < 1.0  # Wide tolerance for random data
 
 
-@karva.tags.parametrize("n", [100, 500])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [100, 500])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_skewness_finite(n: int, seed: int):
     """Skewness should be finite."""
     data = generate_data(n, 0, 5, seed)
@@ -289,8 +289,8 @@ def test_skewness_finite(n: int, seed: int):
 
 
 # Kurtosis tests
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_kurtosis_finite(n: int, seed: int):
     """Kurtosis should be finite."""
     data = generate_data(n, 0, 5, seed)
@@ -298,9 +298,9 @@ def test_kurtosis_finite(n: int, seed: int):
     assert math.isfinite(k)
 
 
-@karva.tags.parametrize("n", [100, 500])
-@karva.tags.parametrize("excess", [True, False])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [100, 500])
+@pytest.mark.parametrize("excess", [True, False])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_kurtosis_excess_vs_raw(n: int, excess: bool, seed: int):
     """Test both excess and raw kurtosis."""
     data = generate_data(n, 0, 5, seed)
@@ -309,9 +309,9 @@ def test_kurtosis_excess_vs_raw(n: int, excess: bool, seed: int):
 
 
 # Percentile tests
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("p", [0, 25, 50, 75, 100])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("p", [0, 25, 50, 75, 100])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_percentile_in_range(n: int, p: float, seed: int):
     """Percentile should be within data range."""
     data = generate_data(n, 0, 5, seed)
@@ -319,8 +319,8 @@ def test_percentile_in_range(n: int, p: float, seed: int):
     assert min(data) <= pct <= max(data)
 
 
-@karva.tags.parametrize("n", [100])
-@karva.tags.parametrize("seed", [42, 123, 456, 789])
+@pytest.mark.parametrize("n", [100])
+@pytest.mark.parametrize("seed", [42, 123, 456, 789])
 def test_percentile_ordering(n: int, seed: int):
     """Percentiles should be ordered."""
     data = generate_data(n, 0, 5, seed)
@@ -331,8 +331,8 @@ def test_percentile_ordering(n: int, seed: int):
 
 
 # Quartiles and IQR tests
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_quartiles_ordered(n: int, seed: int):
     """Quartiles should be ordered."""
     data = generate_data(n, 0, 5, seed)
@@ -340,8 +340,8 @@ def test_quartiles_ordered(n: int, seed: int):
     assert q1 <= q2 <= q3
 
 
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_iqr_positive(n: int, seed: int):
     """IQR should be positive."""
     data = generate_data(n, 0, 5, seed)
@@ -350,8 +350,8 @@ def test_iqr_positive(n: int, seed: int):
 
 
 # Z-score tests
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_zscore_mean_zero(n: int, seed: int):
     """Z-scores should have mean near zero."""
     data = generate_data(n, 0, 5, seed)
@@ -359,8 +359,8 @@ def test_zscore_mean_zero(n: int, seed: int):
     assert abs(mean(z)) < 0.0001
 
 
-@karva.tags.parametrize("n", [50, 100, 500])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [50, 100, 500])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_zscore_std_one(n: int, seed: int):
     """Z-scores should have std near 1."""
     data = generate_data(n, 0, 5, seed)
@@ -369,9 +369,9 @@ def test_zscore_std_one(n: int, seed: int):
 
 
 # Outlier detection tests
-@karva.tags.parametrize("n", [100, 500])
-@karva.tags.parametrize("threshold", [2.0, 2.5, 3.0])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [100, 500])
+@pytest.mark.parametrize("threshold", [2.0, 2.5, 3.0])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_zscore_outliers_indices(n: int, threshold: float, seed: int):
     """Z-score outlier indices should be valid."""
     data = generate_data(n, 0, 5, seed)
@@ -380,9 +380,9 @@ def test_zscore_outliers_indices(n: int, threshold: float, seed: int):
         assert 0 <= idx < n
 
 
-@karva.tags.parametrize("n", [100, 500])
-@karva.tags.parametrize("k", [1.5, 2.0, 3.0])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [100, 500])
+@pytest.mark.parametrize("k", [1.5, 2.0, 3.0])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_iqr_outliers_indices(n: int, k: float, seed: int):
     """IQR outlier indices should be valid."""
     data = generate_data(n, 0, 5, seed)
@@ -392,8 +392,8 @@ def test_iqr_outliers_indices(n: int, k: float, seed: int):
 
 
 # Weighted mean tests
-@karva.tags.parametrize("n", [10, 50, 100])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [10, 50, 100])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_weighted_mean_equals_mean_for_equal_weights(n: int, seed: int):
     """Weighted mean with equal weights should equal mean."""
     data = generate_data(n, 0, 5, seed)
@@ -403,8 +403,8 @@ def test_weighted_mean_equals_mean_for_equal_weights(n: int, seed: int):
     assert abs(wm - m) < 0.0001
 
 
-@karva.tags.parametrize("n", [10, 50, 100])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [10, 50, 100])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_weighted_mean_in_range(n: int, seed: int):
     """Weighted mean should be within data range."""
     data = generate_positive_data(n, 10, 3, seed)
@@ -414,9 +414,9 @@ def test_weighted_mean_in_range(n: int, seed: int):
 
 
 # Geometric mean tests
-@karva.tags.parametrize("n", [10, 50, 100])
-@karva.tags.parametrize("mean_val", [5, 10, 20])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [10, 50, 100])
+@pytest.mark.parametrize("mean_val", [5, 10, 20])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_geometric_mean_positive(n: int, mean_val: float, seed: int):
     """Geometric mean should be positive for positive data."""
     data = generate_positive_data(n, mean_val, 2, seed)
@@ -424,8 +424,8 @@ def test_geometric_mean_positive(n: int, mean_val: float, seed: int):
     assert gm > 0
 
 
-@karva.tags.parametrize("n", [10, 50, 100])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [10, 50, 100])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_geometric_mean_leq_arithmetic(n: int, seed: int):
     """Geometric mean should be <= arithmetic mean."""
     data = generate_positive_data(n, 10, 3, seed)
@@ -435,9 +435,9 @@ def test_geometric_mean_leq_arithmetic(n: int, seed: int):
 
 
 # Harmonic mean tests
-@karva.tags.parametrize("n", [10, 50, 100])
-@karva.tags.parametrize("mean_val", [5, 10, 20])
-@karva.tags.parametrize("seed", [42, 123])
+@pytest.mark.parametrize("n", [10, 50, 100])
+@pytest.mark.parametrize("mean_val", [5, 10, 20])
+@pytest.mark.parametrize("seed", [42, 123])
 def test_harmonic_mean_positive(n: int, mean_val: float, seed: int):
     """Harmonic mean should be positive for positive data."""
     data = generate_positive_data(n, mean_val, 2, seed)
@@ -445,8 +445,8 @@ def test_harmonic_mean_positive(n: int, mean_val: float, seed: int):
     assert hm > 0
 
 
-@karva.tags.parametrize("n", [10, 50, 100])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [10, 50, 100])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_harmonic_mean_leq_geometric(n: int, seed: int):
     """Harmonic mean should be <= geometric mean."""
     data = generate_positive_data(n, 10, 3, seed)
@@ -456,9 +456,9 @@ def test_harmonic_mean_leq_geometric(n: int, seed: int):
 
 
 # Mean inequality: AM >= GM >= HM
-@karva.tags.parametrize("n", [20, 50, 100])
-@karva.tags.parametrize("mean_val", [5, 10, 20])
-@karva.tags.parametrize("seed", [42, 123, 456])
+@pytest.mark.parametrize("n", [20, 50, 100])
+@pytest.mark.parametrize("mean_val", [5, 10, 20])
+@pytest.mark.parametrize("seed", [42, 123, 456])
 def test_mean_inequality(n: int, mean_val: float, seed: int):
     """AM >= GM >= HM should hold."""
     data = generate_positive_data(n, mean_val, 2, seed)

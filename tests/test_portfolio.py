@@ -2,8 +2,7 @@
 
 import math
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.portfolio import (
     simple_return,
@@ -29,7 +28,7 @@ from finlib.portfolio import (
 
 
 # Simple Return Tests
-@karva.tags.parametrize("start,end,expected", [
+@pytest.mark.parametrize("start,end,expected", [
     (100, 110, 0.10),
     (100, 90, -0.10),
     (50, 75, 0.50),
@@ -49,14 +48,14 @@ def test_simple_return_zero_start():
         pass
 
 
-@karva.tags.parametrize("start", [10, 100, 1000, 10000])
+@pytest.mark.parametrize("start", [10, 100, 1000, 10000])
 def test_simple_return_doubling(start: float):
     result = simple_return(start, start * 2)
     assert abs(result - 1.0) < 0.0001
 
 
 # Log Return Tests
-@karva.tags.parametrize("start,end,expected", [
+@pytest.mark.parametrize("start,end,expected", [
     (100, 110, 0.09531),
     (100, 90, -0.10536),
     (50, 75, 0.40546),
@@ -83,7 +82,7 @@ def test_log_return_vs_simple_return():
     assert log < simple
 
 
-@karva.tags.parametrize("multiplier", [1.01, 1.05, 1.10, 1.50, 2.0])
+@pytest.mark.parametrize("multiplier", [1.01, 1.05, 1.10, 1.50, 2.0])
 def test_log_return_formula(multiplier: float):
     start = 100
     end = start * multiplier
@@ -107,7 +106,7 @@ def test_holding_period_return_insufficient_values():
         pass
 
 
-@karva.tags.parametrize("values", [
+@pytest.mark.parametrize("values", [
     [100, 110],
     [100, 105, 110],
     [100, 95, 105, 110, 120],
@@ -119,7 +118,7 @@ def test_holding_period_return_various_lengths(values: list):
 
 
 # Annualized Return Tests
-@karva.tags.parametrize("total_return,years,expected", [
+@pytest.mark.parametrize("total_return,years,expected", [
     (0.10, 1, 0.10),
     (0.21, 2, 0.10),
     (0.6105, 5, 0.10),
@@ -139,7 +138,7 @@ def test_annualized_return_zero_years():
 
 
 # Cumulative Return Tests
-@karva.tags.parametrize("returns,expected", [
+@pytest.mark.parametrize("returns,expected", [
     ([0.10], 0.10),
     ([0.10, 0.10], 0.21),
     ([0.10, -0.10], -0.01),
@@ -180,7 +179,7 @@ def test_twrr_no_cash_flows_equals_hpr():
     assert abs(twrr - hpr) < 0.01
 
 
-@karva.tags.parametrize("values", [
+@pytest.mark.parametrize("values", [
     [100, 110, 120],
     [1000, 1050, 1100, 1150],
     [500, 525, 550, 525, 550],
@@ -206,7 +205,7 @@ def test_mwrr_single_investment():
 
 
 # Portfolio Weights Tests
-@karva.tags.parametrize("values,expected", [
+@pytest.mark.parametrize("values,expected", [
     ([100, 100, 100, 100], [0.25, 0.25, 0.25, 0.25]),
     ([60, 40], [0.60, 0.40]),
     ([50, 30, 20], [0.50, 0.30, 0.20]),
@@ -232,7 +231,7 @@ def test_portfolio_weights_zero_total():
 
 
 # Portfolio Return Tests
-@karva.tags.parametrize("weights,returns,expected", [
+@pytest.mark.parametrize("weights,returns,expected", [
     ([0.5, 0.5], [0.10, 0.20], 0.15),
     ([0.6, 0.4], [0.10, 0.05], 0.08),
     ([0.25, 0.25, 0.25, 0.25], [0.10, 0.05, 0.15, 0.08], 0.095),
@@ -304,7 +303,7 @@ def test_rebalance_portfolio_invalid_weights():
         pass
 
 
-@karva.tags.parametrize("current,target", [
+@pytest.mark.parametrize("current,target", [
     ([4000, 3000, 2000, 1000], [0.25, 0.25, 0.25, 0.25]),
     ([10000, 0, 0], [0.5, 0.3, 0.2]),
 ])
@@ -339,7 +338,7 @@ def test_benchmark_comparison_mismatched_lengths():
 
 
 # Geometric Mean Return Tests
-@karva.tags.parametrize("returns,expected", [
+@pytest.mark.parametrize("returns,expected", [
     ([0.10, 0.10, 0.10], 0.10),
     ([0.20, -0.10, 0.15], 0.0733),
     ([0.05, 0.05, 0.05, 0.05], 0.05),

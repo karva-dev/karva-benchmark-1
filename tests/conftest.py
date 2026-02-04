@@ -1,9 +1,9 @@
 """Shared fixtures for finlib tests."""
 
-from karva import fixture
+import pytest
 
 
-@fixture
+@pytest.fixture
 def sample_returns():
     """Sample daily returns for testing."""
     return [
@@ -14,7 +14,7 @@ def sample_returns():
     ]
 
 
-@fixture
+@pytest.fixture
 def sample_prices():
     """Sample price series for testing."""
     return [
@@ -25,19 +25,19 @@ def sample_prices():
     ]
 
 
-@fixture
+@pytest.fixture
 def sample_portfolio_values():
     """Portfolio values over time."""
     return [10000, 10150, 10080, 10250, 10180, 10350, 10420, 10380, 10500, 10550]
 
 
-@fixture
+@pytest.fixture
 def sample_weights():
     """Portfolio weights."""
     return [0.4, 0.3, 0.2, 0.1]
 
 
-@fixture
+@pytest.fixture
 def sample_covariance_matrix():
     """Sample covariance matrix for 4 assets."""
     return [
@@ -48,7 +48,7 @@ def sample_covariance_matrix():
     ]
 
 
-@fixture
+@pytest.fixture
 def market_returns():
     """Market/benchmark returns."""
     return [
@@ -59,7 +59,7 @@ def market_returns():
     ]
 
 
-@fixture
+@pytest.fixture
 def bond_params():
     """Standard bond parameters."""
     return {
@@ -71,7 +71,7 @@ def bond_params():
     }
 
 
-@fixture
+@pytest.fixture
 def option_params():
     """Standard option parameters."""
     return {
@@ -83,7 +83,7 @@ def option_params():
     }
 
 
-@fixture
+@pytest.fixture
 def loan_params():
     """Standard loan parameters."""
     return {
@@ -93,7 +93,7 @@ def loan_params():
     }
 
 
-@fixture
+@pytest.fixture
 def fx_rates():
     """Foreign exchange rates."""
     return {
@@ -105,7 +105,7 @@ def fx_rates():
     }
 
 
-@fixture
+@pytest.fixture
 def large_returns():
     """Large return series for performance testing."""
     import random
@@ -113,7 +113,7 @@ def large_returns():
     return [random.gauss(0.0005, 0.02) for _ in range(1000)]
 
 
-@fixture
+@pytest.fixture
 def correlation_matrix_3x3():
     """3x3 correlation matrix."""
     return [

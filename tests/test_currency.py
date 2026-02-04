@@ -1,7 +1,6 @@
 """Tests for currency and FX calculations."""
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.currency import (
     direct_to_indirect,
@@ -26,7 +25,7 @@ from finlib.currency import (
 
 
 # Direct/Indirect Quote Tests
-@karva.tags.parametrize("direct,expected_indirect", [
+@pytest.mark.parametrize("direct,expected_indirect", [
     (1.25, 0.80),
     (1.10, 0.909),
     (0.80, 1.25),
@@ -45,7 +44,7 @@ def test_direct_to_indirect_zero():
         pass
 
 
-@karva.tags.parametrize("indirect,expected_direct", [
+@pytest.mark.parametrize("indirect,expected_direct", [
     (0.80, 1.25),
     (0.909, 1.10),
     (1.25, 0.80),
@@ -63,7 +62,7 @@ def test_roundtrip_conversion():
 
 
 # Convert Currency Tests
-@karva.tags.parametrize("amount,rate,is_direct,expected", [
+@pytest.mark.parametrize("amount,rate,is_direct,expected", [
     (100, 1.25, True, 125),
     (100, 0.80, True, 80),
     (100, 1.25, False, 80),
@@ -74,7 +73,7 @@ def test_convert_currency(amount: float, rate: float, is_direct: bool, expected:
 
 
 # Cross Rate Tests
-@karva.tags.parametrize("rate_a,rate_b,expected", [
+@pytest.mark.parametrize("rate_a,rate_b,expected", [
     (1.10, 1.30, 0.846),  # EUR/GBP via USD
     (1.20, 1.10, 1.091),
     (110, 1.10, 100),     # JPY/EUR via USD
@@ -116,7 +115,7 @@ def test_arbitrage_direction():
         assert result["direction"] == "CBA"
 
 
-@karva.tags.parametrize("rate_ab,rate_bc,rate_ca", [
+@pytest.mark.parametrize("rate_ab,rate_bc,rate_ca", [
     (0.90, 1.10, 1.01),
     (1.20, 0.85, 0.99),
     (0.75, 1.30, 1.02),
@@ -128,7 +127,7 @@ def test_triangular_arbitrage_various(rate_ab: float, rate_bc: float, rate_ca: f
 
 
 # Forward Rate Tests
-@karva.tags.parametrize("spot,dom,for_rate,days,expected", [
+@pytest.mark.parametrize("spot,dom,for_rate,days,expected", [
     (1.10, 0.05, 0.03, 90, 1.1054),
     (1.30, 0.04, 0.06, 180, 1.2871),
     (100, 0.01, 0.05, 360, 96.19),  # Corrected: (1+0.01)/(1+0.05) * 100
@@ -149,7 +148,7 @@ def test_forward_rate_same_rates():
     assert abs(result - 1.10) < 0.0001
 
 
-@karva.tags.parametrize("days", [30, 90, 180, 365])
+@pytest.mark.parametrize("days", [30, 90, 180, 365])
 def test_forward_rate_various_tenors(days: int):
     result = forward_rate(1.10, 0.05, 0.03, days)
     assert result > 0
@@ -170,7 +169,7 @@ def test_forward_points_negative():
     assert result < 0
 
 
-@karva.tags.parametrize("spot,fwd", [
+@pytest.mark.parametrize("spot,fwd", [
     (1.1000, 1.1100),
     (1.3000, 1.2900),
     (100.00, 99.50),
@@ -247,7 +246,7 @@ def test_effective_exchange_rate_invalid_weights():
 
 
 # Bid-Ask Spread Tests
-@karva.tags.parametrize("bid,ask,expected", [
+@pytest.mark.parametrize("bid,ask,expected", [
     (1.0990, 1.1010, 0.182),
     (1.2990, 1.3010, 0.154),
     (99.90, 100.10, 0.200),
@@ -266,7 +265,7 @@ def test_bid_ask_spread_invalid():
 
 
 # Mid Rate Tests
-@karva.tags.parametrize("bid,ask,expected", [
+@pytest.mark.parametrize("bid,ask,expected", [
     (1.0990, 1.1010, 1.1000),
     (1.2980, 1.3020, 1.3000),
 ])
@@ -276,7 +275,7 @@ def test_mid_rate(bid: float, ask: float, expected: float):
 
 
 # Pip Value Tests
-@karva.tags.parametrize("lot_size,pip_size,rate,expected", [
+@pytest.mark.parametrize("lot_size,pip_size,rate,expected", [
     (100000, 0.0001, 1.0, 10),
     (10000, 0.0001, 1.0, 1),
     (100000, 0.01, 1.0, 1000),  # JPY pairs
@@ -294,7 +293,7 @@ def test_position_size_basic():
     assert result > 0
 
 
-@karva.tags.parametrize("risk_pct", [0.01, 0.02, 0.05])
+@pytest.mark.parametrize("risk_pct", [0.01, 0.02, 0.05])
 def test_position_size_risk_levels(risk_pct: float):
     result = position_size(10000, risk_pct, 50, 0.0001)
     assert result > 0
@@ -338,7 +337,7 @@ def test_forward_rate_from_parity():
 
 
 # Real Exchange Rate Tests
-@karva.tags.parametrize("nominal,domestic,foreign,expected", [
+@pytest.mark.parametrize("nominal,domestic,foreign,expected", [
     (1.10, 100, 110, 1.21),
     (1.20, 120, 100, 1.00),
 ])
@@ -348,7 +347,7 @@ def test_real_exchange_rate(nominal: float, domestic: float, foreign: float, exp
 
 
 # PPP Rate Tests
-@karva.tags.parametrize("domestic,foreign,expected", [
+@pytest.mark.parametrize("domestic,foreign,expected", [
     (10, 8, 1.25),
     (100, 110, 0.909),
 ])
@@ -385,7 +384,7 @@ def test_arbitrage_free_triangle():
     assert abs(result["product"] - 1) < 0.01
 
 
-@karva.tags.parametrize("spot,dom,foreign", [
+@pytest.mark.parametrize("spot,dom,foreign", [
     (1.10, 0.05, 0.03),
     (1.30, 0.02, 0.06),
     (100, 0.01, 0.05),

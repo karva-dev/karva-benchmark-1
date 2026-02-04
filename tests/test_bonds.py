@@ -1,7 +1,6 @@
 """Tests for bond pricing calculations."""
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.bonds import (
     bond_price,
@@ -25,7 +24,7 @@ from finlib.bonds import (
 
 
 # Bond Price Tests
-@karva.tags.parametrize("face,coupon,ytm,periods,expected", [
+@pytest.mark.parametrize("face,coupon,ytm,periods,expected", [
     (1000, 0.05, 0.04, 10, 1044.52),  # Semi-annual: 5 years, 10 periods
     (1000, 0.05, 0.05, 10, 1000.00),  # At par
     (1000, 0.05, 0.06, 10, 957.35),   # Semi-annual: 5 years, 10 periods
@@ -54,7 +53,7 @@ def test_bond_price_discount():
     assert result < 1000
 
 
-@karva.tags.parametrize("periods", [2, 10, 20, 40, 60])
+@pytest.mark.parametrize("periods", [2, 10, 20, 40, 60])
 def test_bond_price_various_maturities(periods: int):
     result = bond_price(1000, 0.05, 0.04, periods)
     assert result > 0
@@ -65,14 +64,14 @@ def test_bond_price_zero_periods():
     assert result == 1000
 
 
-@karva.tags.parametrize("frequency", [1, 2, 4])
+@pytest.mark.parametrize("frequency", [1, 2, 4])
 def test_bond_price_various_frequencies(frequency: int):
     result = bond_price(1000, 0.05, 0.04, 10, frequency)
     assert result > 0
 
 
 # Zero Coupon Bond Price Tests
-@karva.tags.parametrize("face,ytm,years,expected", [
+@pytest.mark.parametrize("face,ytm,years,expected", [
     (1000, 0.05, 5, 781.20),
     (1000, 0.08, 10, 456.39),
     (1000, 0.03, 2, 942.60),
@@ -96,7 +95,7 @@ def test_ytm_recovery():
     assert abs(ytm - 0.06) < 0.001
 
 
-@karva.tags.parametrize("coupon,expected_ytm", [
+@pytest.mark.parametrize("coupon,expected_ytm", [
     (0.04, 0.0435),
     (0.05, 0.05),
     (0.06, 0.0563),
@@ -122,7 +121,7 @@ def test_ytm_discount_bond():
 
 
 # Current Yield Tests
-@karva.tags.parametrize("price,face,coupon,expected", [
+@pytest.mark.parametrize("price,face,coupon,expected", [
     (1000, 1000, 0.05, 0.05),
     (950, 1000, 0.05, 0.0526),
     (1050, 1000, 0.05, 0.0476),
@@ -159,14 +158,14 @@ def test_macaulay_duration_zero_coupon():
     assert abs(duration - 5.0) < 0.1  # 10 semi-annual periods = 5 years
 
 
-@karva.tags.parametrize("coupon", [0.02, 0.04, 0.06, 0.08])
+@pytest.mark.parametrize("coupon", [0.02, 0.04, 0.06, 0.08])
 def test_duration_decreases_with_coupon(coupon: float):
     low_coupon = macaulay_duration(1000, 0.02, 0.05, 20)
     high_coupon = macaulay_duration(1000, coupon, 0.05, 20)
     assert high_coupon <= low_coupon
 
 
-@karva.tags.parametrize("periods", [4, 10, 20, 40])
+@pytest.mark.parametrize("periods", [4, 10, 20, 40])
 def test_duration_increases_with_maturity(periods: int):
     short = macaulay_duration(1000, 0.05, 0.04, 4)
     long = macaulay_duration(1000, 0.05, 0.04, periods)
@@ -198,7 +197,7 @@ def test_convexity_positive(bond_params):
     assert result > 0
 
 
-@karva.tags.parametrize("periods", [10, 20, 40, 60])
+@pytest.mark.parametrize("periods", [10, 20, 40, 60])
 def test_convexity_increases_with_maturity(periods: int):
     short = convexity(1000, 0.05, 0.04, 10)
     long = convexity(1000, 0.05, 0.04, periods)
@@ -224,7 +223,7 @@ def test_price_change_duration_positive():
     assert change > 0
 
 
-@karva.tags.parametrize("yield_change", [-0.02, -0.01, 0.01, 0.02])
+@pytest.mark.parametrize("yield_change", [-0.02, -0.01, 0.01, 0.02])
 def test_price_change_duration_linear(yield_change: float):
     mod_dur = 7.5
     change = price_change_duration(mod_dur, yield_change)
@@ -245,7 +244,7 @@ def test_price_change_convexity_adjustment():
 
 
 # Accrued Interest Tests
-@karva.tags.parametrize("days,expected", [
+@pytest.mark.parametrize("days,expected", [
     (0, 0),
     (90, 12.50),
     (180, 25.00),
@@ -294,7 +293,7 @@ def test_ytc_vs_ytm():
 
 
 # Spread Tests
-@karva.tags.parametrize("bond_ytm,bench_ytm,expected", [
+@pytest.mark.parametrize("bond_ytm,bench_ytm,expected", [
     (0.055, 0.045, 100),
     (0.08, 0.05, 300),
     (0.045, 0.05, -50),
@@ -313,7 +312,7 @@ def test_dollar_duration_basic():
     assert abs(result - expected) < 0.01
 
 
-@karva.tags.parametrize("price", [900, 1000, 1100, 1200])
+@pytest.mark.parametrize("price", [900, 1000, 1100, 1200])
 def test_dollar_duration_scales_with_price(price: float):
     mod_dur = 7.5
     result = dollar_duration(price, mod_dur)
@@ -384,7 +383,7 @@ def test_duration_convexity_price_change():
     assert abs(estimated_change - actual_change) < 0.01
 
 
-@karva.tags.parametrize("ytm", [0.02, 0.04, 0.06, 0.08, 0.10])
+@pytest.mark.parametrize("ytm", [0.02, 0.04, 0.06, 0.08, 0.10])
 def test_bond_price_ytm_relationship(ytm: float):
     price = bond_price(1000, 0.05, ytm, 20)
     recovered_ytm = yield_to_maturity(price, 1000, 0.05, 20)

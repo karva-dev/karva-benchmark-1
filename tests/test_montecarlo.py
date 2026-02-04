@@ -2,7 +2,7 @@
 
 import math
 
-import karva
+import pytest
 
 from finlib.montecarlo import (
     geometric_brownian_motion,
@@ -41,13 +41,13 @@ def test_gbm_reproducible():
     assert path1 == path2
 
 
-@karva.tags.parametrize("mu", [-0.10, 0.0, 0.10, 0.20])
+@pytest.mark.parametrize("mu", [-0.10, 0.0, 0.10, 0.20])
 def test_gbm_various_drifts(mu: float):
     path = geometric_brownian_motion(100, mu, 0.20, 1.0, 0.01, seed=42)
     assert len(path) > 0
 
 
-@karva.tags.parametrize("sigma", [0.10, 0.20, 0.30, 0.50])
+@pytest.mark.parametrize("sigma", [0.10, 0.20, 0.30, 0.50])
 def test_gbm_various_volatilities(sigma: float):
     path = geometric_brownian_motion(100, 0.10, sigma, 1.0, 0.01, seed=42)
     assert all(p > 0 for p in path)
@@ -119,7 +119,7 @@ def test_mc_var_cvar_greater():
     assert result["cvar"] >= result["var"]
 
 
-@karva.tags.parametrize("confidence", [0.90, 0.95, 0.99])
+@pytest.mark.parametrize("confidence", [0.90, 0.95, 0.99])
 def test_mc_var_confidence_levels(confidence: float):
     result = monte_carlo_var(100000, 0.08, 0.15, 1/252, confidence, 1000, seed=42)
     assert result["var"] > 0
@@ -162,7 +162,7 @@ def test_mc_option_has_std_error():
     assert result["std_error"] > 0
 
 
-@karva.tags.parametrize("K", [90, 95, 100, 105, 110])
+@pytest.mark.parametrize("K", [90, 95, 100, 105, 110])
 def test_mc_option_various_strikes(K: float):
     result = monte_carlo_option_price(100, K, 0.05, 0.20, 1.0, "call", 1000, seed=42)
     assert result["price"] >= 0
@@ -189,7 +189,7 @@ def test_mc_asian_cheaper_than_european():
     assert asian["price"] < european["price"] * 1.1
 
 
-@karva.tags.parametrize("steps", [12, 52, 252])
+@pytest.mark.parametrize("steps", [12, 52, 252])
 def test_mc_asian_various_averaging(steps: int):
     result = monte_carlo_asian_option(100, 100, 0.05, 0.20, 1.0, steps, "call", 500, seed=42)
     assert result["price"] >= 0
@@ -312,7 +312,7 @@ def test_retirement_simulation_percentiles():
     assert result["median_final_value"] <= result["percentile_90"]
 
 
-@karva.tags.parametrize("num_sims", [50, 100, 200])
+@pytest.mark.parametrize("num_sims", [50, 100, 200])
 def test_retirement_various_simulations(num_sims: int):
     result = simulate_retirement(
         initial_savings=100000,

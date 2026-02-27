@@ -1,7 +1,6 @@
 """Tests for currency and FX calculations."""
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.currency import (
     direct_to_indirect,
@@ -26,12 +25,15 @@ from finlib.currency import (
 
 
 # Direct/Indirect Quote Tests
-@karva.tags.parametrize("direct,expected_indirect", [
-    (1.25, 0.80),
-    (1.10, 0.909),
-    (0.80, 1.25),
-    (2.00, 0.50),
-])
+@pytest.mark.parametrize(
+    "direct,expected_indirect",
+    [
+        (1.25, 0.80),
+        (1.10, 0.909),
+        (0.80, 1.25),
+        (2.00, 0.50),
+    ],
+)
 def test_direct_to_indirect(direct: float, expected_indirect: float):
     result = direct_to_indirect(direct)
     assert abs(result - expected_indirect) < 0.001
@@ -45,11 +47,14 @@ def test_direct_to_indirect_zero():
         pass
 
 
-@karva.tags.parametrize("indirect,expected_direct", [
-    (0.80, 1.25),
-    (0.909, 1.10),
-    (1.25, 0.80),
-])
+@pytest.mark.parametrize(
+    "indirect,expected_direct",
+    [
+        (0.80, 1.25),
+        (0.909, 1.10),
+        (1.25, 0.80),
+    ],
+)
 def test_indirect_to_direct(indirect: float, expected_direct: float):
     result = indirect_to_direct(indirect)
     assert abs(result - expected_direct) < 0.01
@@ -63,22 +68,28 @@ def test_roundtrip_conversion():
 
 
 # Convert Currency Tests
-@karva.tags.parametrize("amount,rate,is_direct,expected", [
-    (100, 1.25, True, 125),
-    (100, 0.80, True, 80),
-    (100, 1.25, False, 80),
-])
+@pytest.mark.parametrize(
+    "amount,rate,is_direct,expected",
+    [
+        (100, 1.25, True, 125),
+        (100, 0.80, True, 80),
+        (100, 1.25, False, 80),
+    ],
+)
 def test_convert_currency(amount: float, rate: float, is_direct: bool, expected: float):
     result = convert_currency(amount, rate, is_direct)
     assert abs(result - expected) < 0.01
 
 
 # Cross Rate Tests
-@karva.tags.parametrize("rate_a,rate_b,expected", [
-    (1.10, 1.30, 0.846),  # EUR/GBP via USD
-    (1.20, 1.10, 1.091),
-    (110, 1.10, 100),     # JPY/EUR via USD
-])
+@pytest.mark.parametrize(
+    "rate_a,rate_b,expected",
+    [
+        (1.10, 1.30, 0.846),  # EUR/GBP via USD
+        (1.20, 1.10, 1.091),
+        (110, 1.10, 100),  # JPY/EUR via USD
+    ],
+)
 def test_cross_rate(rate_a: float, rate_b: float, expected: float):
     result = cross_rate(rate_a, rate_b)
     assert abs(result - expected) < 0.01
@@ -116,11 +127,14 @@ def test_arbitrage_direction():
         assert result["direction"] == "CBA"
 
 
-@karva.tags.parametrize("rate_ab,rate_bc,rate_ca", [
-    (0.90, 1.10, 1.01),
-    (1.20, 0.85, 0.99),
-    (0.75, 1.30, 1.02),
-])
+@pytest.mark.parametrize(
+    "rate_ab,rate_bc,rate_ca",
+    [
+        (0.90, 1.10, 1.01),
+        (1.20, 0.85, 0.99),
+        (0.75, 1.30, 1.02),
+    ],
+)
 def test_triangular_arbitrage_various(rate_ab: float, rate_bc: float, rate_ca: float):
     result = triangular_arbitrage(rate_ab, rate_bc, rate_ca)
     assert "product" in result
@@ -128,12 +142,17 @@ def test_triangular_arbitrage_various(rate_ab: float, rate_bc: float, rate_ca: f
 
 
 # Forward Rate Tests
-@karva.tags.parametrize("spot,dom,for_rate,days,expected", [
-    (1.10, 0.05, 0.03, 90, 1.1054),
-    (1.30, 0.04, 0.06, 180, 1.2871),
-    (100, 0.01, 0.05, 360, 96.19),  # Corrected: (1+0.01)/(1+0.05) * 100
-])
-def test_forward_rate(spot: float, dom: float, for_rate: float, days: int, expected: float):
+@pytest.mark.parametrize(
+    "spot,dom,for_rate,days,expected",
+    [
+        (1.10, 0.05, 0.03, 90, 1.1054),
+        (1.30, 0.04, 0.06, 180, 1.2871),
+        (100, 0.01, 0.05, 360, 96.19),  # Corrected: (1+0.01)/(1+0.05) * 100
+    ],
+)
+def test_forward_rate(
+    spot: float, dom: float, for_rate: float, days: int, expected: float
+):
     result = forward_rate(spot, dom, for_rate, days)
     assert abs(result - expected) < 0.1
 
@@ -149,7 +168,7 @@ def test_forward_rate_same_rates():
     assert abs(result - 1.10) < 0.0001
 
 
-@karva.tags.parametrize("days", [30, 90, 180, 365])
+@pytest.mark.parametrize("days", [30, 90, 180, 365])
 def test_forward_rate_various_tenors(days: int):
     result = forward_rate(1.10, 0.05, 0.03, days)
     assert result > 0
@@ -170,11 +189,14 @@ def test_forward_points_negative():
     assert result < 0
 
 
-@karva.tags.parametrize("spot,fwd", [
-    (1.1000, 1.1100),
-    (1.3000, 1.2900),
-    (100.00, 99.50),
-])
+@pytest.mark.parametrize(
+    "spot,fwd",
+    [
+        (1.1000, 1.1100),
+        (1.3000, 1.2900),
+        (100.00, 99.50),
+    ],
+)
 def test_forward_points_various(spot: float, fwd: float):
     result = forward_points(spot, fwd)
     expected = (fwd - spot) / 0.0001
@@ -247,11 +269,14 @@ def test_effective_exchange_rate_invalid_weights():
 
 
 # Bid-Ask Spread Tests
-@karva.tags.parametrize("bid,ask,expected", [
-    (1.0990, 1.1010, 0.182),
-    (1.2990, 1.3010, 0.154),
-    (99.90, 100.10, 0.200),
-])
+@pytest.mark.parametrize(
+    "bid,ask,expected",
+    [
+        (1.0990, 1.1010, 0.182),
+        (1.2990, 1.3010, 0.154),
+        (99.90, 100.10, 0.200),
+    ],
+)
 def test_bid_ask_spread(bid: float, ask: float, expected: float):
     result = bid_ask_spread(bid, ask)
     assert abs(result - expected) < 0.01
@@ -266,21 +291,27 @@ def test_bid_ask_spread_invalid():
 
 
 # Mid Rate Tests
-@karva.tags.parametrize("bid,ask,expected", [
-    (1.0990, 1.1010, 1.1000),
-    (1.2980, 1.3020, 1.3000),
-])
+@pytest.mark.parametrize(
+    "bid,ask,expected",
+    [
+        (1.0990, 1.1010, 1.1000),
+        (1.2980, 1.3020, 1.3000),
+    ],
+)
 def test_mid_rate(bid: float, ask: float, expected: float):
     result = mid_rate(bid, ask)
     assert abs(result - expected) < 0.0001
 
 
 # Pip Value Tests
-@karva.tags.parametrize("lot_size,pip_size,rate,expected", [
-    (100000, 0.0001, 1.0, 10),
-    (10000, 0.0001, 1.0, 1),
-    (100000, 0.01, 1.0, 1000),  # JPY pairs
-])
+@pytest.mark.parametrize(
+    "lot_size,pip_size,rate,expected",
+    [
+        (100000, 0.0001, 1.0, 10),
+        (10000, 0.0001, 1.0, 1),
+        (100000, 0.01, 1.0, 1000),  # JPY pairs
+    ],
+)
 def test_pip_value(lot_size: float, pip_size: float, rate: float, expected: float):
     result = pip_value(lot_size, pip_size, rate)
     assert abs(result - expected) < 0.01
@@ -294,7 +325,7 @@ def test_position_size_basic():
     assert result > 0
 
 
-@karva.tags.parametrize("risk_pct", [0.01, 0.02, 0.05])
+@pytest.mark.parametrize("risk_pct", [0.01, 0.02, 0.05])
 def test_position_size_risk_levels(risk_pct: float):
     result = position_size(10000, risk_pct, 50, 0.0001)
     assert result > 0
@@ -338,20 +369,28 @@ def test_forward_rate_from_parity():
 
 
 # Real Exchange Rate Tests
-@karva.tags.parametrize("nominal,domestic,foreign,expected", [
-    (1.10, 100, 110, 1.21),
-    (1.20, 120, 100, 1.00),
-])
-def test_real_exchange_rate(nominal: float, domestic: float, foreign: float, expected: float):
+@pytest.mark.parametrize(
+    "nominal,domestic,foreign,expected",
+    [
+        (1.10, 100, 110, 1.21),
+        (1.20, 120, 100, 1.00),
+    ],
+)
+def test_real_exchange_rate(
+    nominal: float, domestic: float, foreign: float, expected: float
+):
     result = real_exchange_rate(nominal, domestic, foreign)
     assert abs(result - expected) < 0.01
 
 
 # PPP Rate Tests
-@karva.tags.parametrize("domestic,foreign,expected", [
-    (10, 8, 1.25),
-    (100, 110, 0.909),
-])
+@pytest.mark.parametrize(
+    "domestic,foreign,expected",
+    [
+        (10, 8, 1.25),
+        (100, 110, 0.909),
+    ],
+)
 def test_ppp_rate(domestic: float, foreign: float, expected: float):
     result = purchasing_power_parity_rate(domestic, foreign)
     assert abs(result - expected) < 0.01
@@ -380,16 +419,19 @@ def test_arbitrage_free_triangle():
     usd_gbp = 1.30
     eur_gbp = usd_gbp / usd_eur  # Cross rate
 
-    result = triangular_arbitrage(usd_eur, 1/usd_gbp, eur_gbp)
+    result = triangular_arbitrage(usd_eur, 1 / usd_gbp, eur_gbp)
     # Product should be approximately 1
     assert abs(result["product"] - 1) < 0.01
 
 
-@karva.tags.parametrize("spot,dom,foreign", [
-    (1.10, 0.05, 0.03),
-    (1.30, 0.02, 0.06),
-    (100, 0.01, 0.05),
-])
+@pytest.mark.parametrize(
+    "spot,dom,foreign",
+    [
+        (1.10, 0.05, 0.03),
+        (1.30, 0.02, 0.06),
+        (100, 0.01, 0.05),
+    ],
+)
 def test_interest_rate_parity(spot: float, dom: float, foreign: float):
     days = 180
     fwd = forward_rate(spot, dom, foreign, days)

@@ -1,6 +1,6 @@
 """Tests for amortization calculations."""
 
-import karva
+import pytest
 
 from finlib.amortization import (
     monthly_payment,
@@ -18,14 +18,19 @@ from finlib.amortization import (
 
 
 # Monthly Payment Tests
-@karva.tags.parametrize("principal,rate,months,expected", [
-    (200000, 0.06, 360, 1199.10),
-    (100000, 0.05, 180, 790.79),
-    (300000, 0.045, 360, 1520.06),
-    (150000, 0.07, 240, 1162.95),
-    (250000, 0.055, 360, 1419.47),
-])
-def test_monthly_payment_basic(principal: float, rate: float, months: int, expected: float):
+@pytest.mark.parametrize(
+    "principal,rate,months,expected",
+    [
+        (200000, 0.06, 360, 1199.10),
+        (100000, 0.05, 180, 790.79),
+        (300000, 0.045, 360, 1520.06),
+        (150000, 0.07, 240, 1162.95),
+        (250000, 0.055, 360, 1419.47),
+    ],
+)
+def test_monthly_payment_basic(
+    principal: float, rate: float, months: int, expected: float
+):
     result = monthly_payment(principal, rate, months)
     assert abs(result - expected) < 0.1
 
@@ -35,7 +40,7 @@ def test_monthly_payment_zero_rate():
     assert abs(result - 1000) < 0.01
 
 
-@karva.tags.parametrize("months", [60, 120, 180, 240, 360])
+@pytest.mark.parametrize("months", [60, 120, 180, 240, 360])
 def test_payment_decreases_with_longer_term(months: int):
     principal, rate = 200000, 0.06
     short_payment = monthly_payment(principal, rate, 60)
@@ -43,7 +48,7 @@ def test_payment_decreases_with_longer_term(months: int):
     assert long_payment <= short_payment
 
 
-@karva.tags.parametrize("rate", [0.03, 0.05, 0.07, 0.09])
+@pytest.mark.parametrize("rate", [0.03, 0.05, 0.07, 0.09])
 def test_payment_increases_with_higher_rate(rate: float):
     principal, months = 200000, 360
     low_payment = monthly_payment(principal, 0.03, months)
@@ -93,7 +98,7 @@ def test_amortization_schedule_principal_interest_sum():
         assert abs(entry["payment"] - expected_sum) < 0.01
 
 
-@karva.tags.parametrize("extra", [100, 200, 500, 1000])
+@pytest.mark.parametrize("extra", [100, 200, 500, 1000])
 def test_amortization_with_extra_payment(extra: float):
     base_schedule = amortization_schedule(200000, 0.06, 360)
     extra_schedule = amortization_schedule(200000, 0.06, 360, extra)
@@ -109,14 +114,14 @@ def test_amortization_extra_payment_saves_interest():
 
 
 # Principal/Interest Payment Tests
-@karva.tags.parametrize("period", [1, 12, 60, 120, 180])
+@pytest.mark.parametrize("period", [1, 12, 60, 120, 180])
 def test_principal_payment_period(period: int):
     principal, rate, months = 200000, 0.06, 360
     p_payment = principal_payment(principal, rate, months, period)
     assert p_payment > 0
 
 
-@karva.tags.parametrize("period", [1, 12, 60, 120, 180])
+@pytest.mark.parametrize("period", [1, 12, 60, 120, 180])
 def test_interest_payment_period(period: int):
     principal, rate, months = 200000, 0.06, 360
     i_payment = interest_payment(principal, rate, months, period)
@@ -165,14 +170,17 @@ def test_interest_payment_invalid_period():
 
 
 # Remaining Balance Tests
-@karva.tags.parametrize("payments_made,expected_approx", [
-    (0, 200000),
-    (60, 186109),
-    (120, 167371),
-    (180, 142098),
-    (240, 108007),
-    (300, 62024),
-])
+@pytest.mark.parametrize(
+    "payments_made,expected_approx",
+    [
+        (0, 200000),
+        (60, 186109),
+        (120, 167371),
+        (180, 142098),
+        (240, 108007),
+        (300, 62024),
+    ],
+)
 def test_remaining_balance(payments_made: int, expected_approx: float):
     balance = remaining_balance(200000, 0.06, 360, payments_made)
     assert abs(balance - expected_approx) < 200
@@ -192,12 +200,17 @@ def test_remaining_balance_negative_payments():
 
 
 # Total Interest Tests
-@karva.tags.parametrize("principal,rate,months,expected_approx", [
-    (200000, 0.06, 360, 231676),
-    (100000, 0.05, 180, 42343),
-    (300000, 0.045, 360, 247221),
-])
-def test_total_interest(principal: float, rate: float, months: int, expected_approx: float):
+@pytest.mark.parametrize(
+    "principal,rate,months,expected_approx",
+    [
+        (200000, 0.06, 360, 231676),
+        (100000, 0.05, 180, 42343),
+        (300000, 0.045, 360, 247221),
+    ],
+)
+def test_total_interest(
+    principal: float, rate: float, months: int, expected_approx: float
+):
     result = total_interest(principal, rate, months)
     assert abs(result - expected_approx) < 100
 
@@ -227,7 +240,7 @@ def test_early_payoff_saves_interest():
     assert savings["interest_saved"] > 0
 
 
-@karva.tags.parametrize("extra", [100, 200, 500, 1000])
+@pytest.mark.parametrize("extra", [100, 200, 500, 1000])
 def test_more_extra_saves_more(extra: float):
     small = early_payoff_savings(200000, 0.06, 360, extra)
     large = early_payoff_savings(200000, 0.06, 360, extra + 100)
@@ -257,7 +270,7 @@ def test_balloon_invalid_month():
         pass
 
 
-@karva.tags.parametrize("balloon_month", [12, 36, 60, 84])
+@pytest.mark.parametrize("balloon_month", [12, 36, 60, 84])
 def test_balloon_at_various_months(balloon_month: int):
     result = balloon_payment(200000, 0.06, 360, balloon_month)
     assert result["balloon_amount"] > 0
@@ -265,11 +278,14 @@ def test_balloon_at_various_months(balloon_month: int):
 
 
 # Loan-to-Value Tests
-@karva.tags.parametrize("loan,value,expected", [
-    (160000, 200000, 0.80),
-    (180000, 200000, 0.90),
-    (100000, 250000, 0.40),
-])
+@pytest.mark.parametrize(
+    "loan,value,expected",
+    [
+        (160000, 200000, 0.80),
+        (180000, 200000, 0.90),
+        (100000, 250000, 0.40),
+    ],
+)
 def test_loan_to_value(loan: float, value: float, expected: float):
     result = loan_to_value(loan, value)
     assert abs(result - expected) < 0.001
@@ -284,11 +300,14 @@ def test_ltv_invalid_property_value():
 
 
 # Debt-to-Income Tests
-@karva.tags.parametrize("debt,income,expected", [
-    (2000, 5000, 0.40),
-    (1500, 6000, 0.25),
-    (3000, 10000, 0.30),
-])
+@pytest.mark.parametrize(
+    "debt,income,expected",
+    [
+        (2000, 5000, 0.40),
+        (1500, 6000, 0.25),
+        (3000, 10000, 0.30),
+    ],
+)
 def test_debt_to_income(debt: float, income: float, expected: float):
     result = debt_to_income(debt, income)
     assert abs(result - expected) < 0.001
@@ -319,7 +338,7 @@ def test_max_loan_zero_when_dti_exceeded():
     assert result <= max_loan_amount(5000, 0.30, 1000, 0.06, 360)
 
 
-@karva.tags.parametrize("max_dti", [0.28, 0.36, 0.43])
+@pytest.mark.parametrize("max_dti", [0.28, 0.36, 0.43])
 def test_max_loan_increases_with_dti(max_dti: float):
     low_dti = max_loan_amount(8000, 0.28, 500, 0.06, 360)
     high_dti = max_loan_amount(8000, max_dti, 500, 0.06, 360)

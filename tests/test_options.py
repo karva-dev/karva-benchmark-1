@@ -2,8 +2,7 @@
 
 import math
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.options import (
     black_scholes_call,
@@ -30,14 +29,19 @@ from finlib.options import (
 
 
 # Black-Scholes Call Tests
-@karva.tags.parametrize("S,K,r,sigma,T,expected", [
-    (100, 100, 0.05, 0.20, 1.0, 10.45),
-    (100, 95, 0.05, 0.20, 1.0, 13.70),
-    (100, 105, 0.05, 0.20, 1.0, 7.97),
-    (50, 50, 0.08, 0.30, 0.5, 5.13),
-    (100, 100, 0.05, 0.40, 1.0, 17.80),
-])
-def test_black_scholes_call_values(S: float, K: float, r: float, sigma: float, T: float, expected: float):
+@pytest.mark.parametrize(
+    "S,K,r,sigma,T,expected",
+    [
+        (100, 100, 0.05, 0.20, 1.0, 10.45),
+        (100, 95, 0.05, 0.20, 1.0, 13.70),
+        (100, 105, 0.05, 0.20, 1.0, 7.97),
+        (50, 50, 0.08, 0.30, 0.5, 5.13),
+        (100, 100, 0.05, 0.40, 1.0, 17.80),
+    ],
+)
+def test_black_scholes_call_values(
+    S: float, K: float, r: float, sigma: float, T: float, expected: float
+):
     result = black_scholes_call(S, K, r, sigma, T)
     assert abs(result - expected) < 0.5
 
@@ -56,14 +60,14 @@ def test_black_scholes_call_positive():
     assert result > 0
 
 
-@karva.tags.parametrize("sigma", [0.10, 0.20, 0.30, 0.40, 0.50])
+@pytest.mark.parametrize("sigma", [0.10, 0.20, 0.30, 0.40, 0.50])
 def test_call_increases_with_volatility(sigma: float):
     low_vol = black_scholes_call(100, 100, 0.05, 0.10, 1.0)
     high_vol = black_scholes_call(100, 100, 0.05, sigma, 1.0)
     assert high_vol >= low_vol
 
 
-@karva.tags.parametrize("T", [0.25, 0.5, 1.0, 2.0])
+@pytest.mark.parametrize("T", [0.25, 0.5, 1.0, 2.0])
 def test_call_increases_with_time(T: float):
     short_time = black_scholes_call(100, 100, 0.05, 0.20, 0.25)
     long_time = black_scholes_call(100, 100, 0.05, 0.20, T)
@@ -71,13 +75,18 @@ def test_call_increases_with_time(T: float):
 
 
 # Black-Scholes Put Tests
-@karva.tags.parametrize("S,K,r,sigma,T,expected", [
-    (100, 100, 0.05, 0.20, 1.0, 5.57),
-    (100, 95, 0.05, 0.20, 1.0, 4.06),
-    (100, 105, 0.05, 0.20, 1.0, 7.84),
-    (50, 50, 0.08, 0.30, 0.5, 3.17),
-])
-def test_black_scholes_put_values(S: float, K: float, r: float, sigma: float, T: float, expected: float):
+@pytest.mark.parametrize(
+    "S,K,r,sigma,T,expected",
+    [
+        (100, 100, 0.05, 0.20, 1.0, 5.57),
+        (100, 95, 0.05, 0.20, 1.0, 4.06),
+        (100, 105, 0.05, 0.20, 1.0, 7.84),
+        (50, 50, 0.08, 0.30, 0.5, 3.17),
+    ],
+)
+def test_black_scholes_put_values(
+    S: float, K: float, r: float, sigma: float, T: float, expected: float
+):
     result = black_scholes_put(S, K, r, sigma, T)
     assert abs(result - expected) < 0.5
 
@@ -92,12 +101,15 @@ def test_black_scholes_put_at_expiry():
 
 
 # Put-Call Parity Tests
-@karva.tags.parametrize("S,K,r,T", [
-    (100, 100, 0.05, 1.0),
-    (100, 95, 0.05, 0.5),
-    (50, 55, 0.08, 0.25),
-    (100, 100, 0.10, 2.0),
-])
+@pytest.mark.parametrize(
+    "S,K,r,T",
+    [
+        (100, 100, 0.05, 1.0),
+        (100, 95, 0.05, 0.5),
+        (50, 55, 0.08, 0.25),
+        (100, 100, 0.10, 2.0),
+    ],
+)
 def test_put_call_parity(S: float, K: float, r: float, T: float):
     call = black_scholes_call(S, K, r, 0.20, T)
     put = black_scholes_put(S, K, r, 0.20, T)
@@ -125,10 +137,13 @@ def test_put_call_parity_implied_put():
 
 
 # Delta Tests
-@karva.tags.parametrize("option_type,expected_range", [
-    ("call", (0, 1)),
-    ("put", (-1, 0)),
-])
+@pytest.mark.parametrize(
+    "option_type,expected_range",
+    [
+        ("call", (0, 1)),
+        ("put", (-1, 0)),
+    ],
+)
 def test_delta_range(option_type: str, expected_range: tuple):
     result = delta(100, 100, 0.05, 0.20, 1.0, option_type)
     assert expected_range[0] <= result <= expected_range[1]
@@ -157,7 +172,7 @@ def test_delta_call_put_relationship():
     assert abs(call_delta - put_delta - 1) < 0.01
 
 
-@karva.tags.parametrize("S", [80, 90, 100, 110, 120])
+@pytest.mark.parametrize("S", [80, 90, 100, 110, 120])
 def test_delta_increases_with_stock_price_call(S: float):
     result = delta(S, 100, 0.05, 0.20, 1.0, "call")
     assert 0 <= result <= 1
@@ -184,7 +199,7 @@ def test_gamma_same_for_call_put():
     assert call_gamma > 0
 
 
-@karva.tags.parametrize("T", [0.1, 0.25, 0.5, 1.0])
+@pytest.mark.parametrize("T", [0.1, 0.25, 0.5, 1.0])
 def test_gamma_increases_near_expiry(T: float):
     # Gamma generally increases as expiry approaches for ATM options
     result = gamma(100, 100, 0.05, 0.20, T)
@@ -198,7 +213,7 @@ def test_theta_negative_for_long():
     assert call_theta < 0  # Time decay hurts long positions
 
 
-@karva.tags.parametrize("T", [0.1, 0.25, 0.5, 1.0])
+@pytest.mark.parametrize("T", [0.1, 0.25, 0.5, 1.0])
 def test_theta_various_expirations(T: float):
     result = theta(100, 100, 0.05, 0.20, T, "call")
     assert result < 0
@@ -229,7 +244,7 @@ def test_vega_increases_with_time():
     assert long > short
 
 
-@karva.tags.parametrize("S", [80, 90, 100, 110, 120])
+@pytest.mark.parametrize("S", [80, 90, 100, 110, 120])
 def test_vega_various_strikes(S: float):
     result = vega(S, 100, 0.05, 0.20, 1.0)
     assert result >= 0
@@ -246,14 +261,14 @@ def test_rho_put_negative():
     assert result < 0
 
 
-@karva.tags.parametrize("T", [0.25, 0.5, 1.0, 2.0])
+@pytest.mark.parametrize("T", [0.25, 0.5, 1.0, 2.0])
 def test_rho_increases_with_time(T: float):
     result = rho(100, 100, 0.05, 0.20, T, "call")
     assert result > 0
 
 
 # Binomial Tree Tests
-@karva.tags.parametrize("steps", [10, 50, 100])
+@pytest.mark.parametrize("steps", [10, 50, 100])
 def test_binomial_converges_to_bs(steps: int):
     S, K, r, sigma, T = 100, 100, 0.05, 0.20, 1.0
     bs_call = black_scholes_call(S, K, r, sigma, T)
@@ -278,7 +293,7 @@ def test_binomial_american_vs_european():
     assert american_put >= european_put - 0.01
 
 
-@karva.tags.parametrize("steps", [20, 50, 100, 150])
+@pytest.mark.parametrize("steps", [20, 50, 100, 150])
 def test_binomial_deep_tree(steps: int):
     result = binomial_tree_price(100, 100, 0.05, 0.20, 1.0, steps, "call")
     assert result > 0
@@ -293,7 +308,7 @@ def test_implied_volatility_recovery():
     assert abs(recovered_vol - true_vol) < 0.01
 
 
-@karva.tags.parametrize("sigma", [0.15, 0.20, 0.25, 0.30, 0.40])
+@pytest.mark.parametrize("sigma", [0.15, 0.20, 0.25, 0.30, 0.40])
 def test_implied_volatility_various(sigma: float):
     S, K, r, T = 100, 100, 0.05, 1.0
     call_price = black_scholes_call(S, K, r, sigma, T)
@@ -315,21 +330,27 @@ def test_implied_volatility_at_expiry():
 
 
 # Option Payoff Tests
-@karva.tags.parametrize("S,K,expected", [
-    (110, 100, 10),
-    (100, 100, 0),
-    (90, 100, 0),
-])
+@pytest.mark.parametrize(
+    "S,K,expected",
+    [
+        (110, 100, 10),
+        (100, 100, 0),
+        (90, 100, 0),
+    ],
+)
 def test_call_payoff(S: float, K: float, expected: float):
     result = option_payoff(S, K, "call", "long")
     assert abs(result - expected) < 0.01
 
 
-@karva.tags.parametrize("S,K,expected", [
-    (90, 100, 10),
-    (100, 100, 0),
-    (110, 100, 0),
-])
+@pytest.mark.parametrize(
+    "S,K,expected",
+    [
+        (90, 100, 10),
+        (100, 100, 0),
+        (110, 100, 0),
+    ],
+)
 def test_put_payoff(S: float, K: float, expected: float):
     result = option_payoff(S, K, "put", "long")
     assert abs(result - expected) < 0.01
@@ -361,22 +382,28 @@ def test_option_profit_short():
 
 
 # Breakeven Tests
-@karva.tags.parametrize("K,premium,option_type,expected", [
-    (100, 5, "call", 105),
-    (100, 5, "put", 95),
-])
+@pytest.mark.parametrize(
+    "K,premium,option_type,expected",
+    [
+        (100, 5, "call", 105),
+        (100, 5, "put", 95),
+    ],
+)
 def test_breakeven_price(K: float, premium: float, option_type: str, expected: float):
     result = breakeven_price(K, premium, option_type)
     assert abs(result - expected) < 0.01
 
 
 # Intrinsic Value Tests
-@karva.tags.parametrize("S,K,option_type,expected", [
-    (110, 100, "call", 10),
-    (90, 100, "call", 0),
-    (90, 100, "put", 10),
-    (110, 100, "put", 0),
-])
+@pytest.mark.parametrize(
+    "S,K,option_type,expected",
+    [
+        (110, 100, "call", 10),
+        (90, 100, "call", 0),
+        (90, 100, "put", 10),
+        (110, 100, "put", 0),
+    ],
+)
 def test_intrinsic_value(S: float, K: float, option_type: str, expected: float):
     result = intrinsic_value(S, K, option_type)
     assert abs(result - expected) < 0.01
@@ -402,14 +429,17 @@ def test_time_value_atm_highest():
 
 
 # Moneyness Tests
-@karva.tags.parametrize("S,K,option_type,expected", [
-    (110, 100, "call", "ITM"),
-    (100, 100, "call", "ATM"),
-    (90, 100, "call", "OTM"),
-    (90, 100, "put", "ITM"),
-    (100, 100, "put", "ATM"),
-    (110, 100, "put", "OTM"),
-])
+@pytest.mark.parametrize(
+    "S,K,option_type,expected",
+    [
+        (110, 100, "call", "ITM"),
+        (100, 100, "call", "ATM"),
+        (90, 100, "call", "OTM"),
+        (90, 100, "put", "ITM"),
+        (100, 100, "put", "ATM"),
+        (110, 100, "put", "OTM"),
+    ],
+)
 def test_moneyness(S: float, K: float, option_type: str, expected: str):
     result = moneyness(S, K, option_type)
     assert result == expected
@@ -428,11 +458,14 @@ def test_straddle_payoff_breakeven():
     assert abs(result) < 0.01
 
 
-@karva.tags.parametrize("S,expected", [
-    (80, 10),   # 100-80-10 = 10
-    (120, 10),  # 120-100-10 = 10
-    (100, -10), # No payoff - premium
-])
+@pytest.mark.parametrize(
+    "S,expected",
+    [
+        (80, 10),  # 100-80-10 = 10
+        (120, 10),  # 120-100-10 = 10
+        (100, -10),  # No payoff - premium
+    ],
+)
 def test_straddle_various_prices(S: float, expected: float):
     result = straddle_payoff(S, 100, 5, 5)
     assert abs(result - expected) < 0.01

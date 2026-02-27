@@ -5,9 +5,10 @@ description = "Financial Calculations Library for benchmarking test runners"
 requires-python = ">=3.10"
 dependencies = []
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "karva>=0.0.1a1",
+    "pytest",
+    "pytest-xdist"
 ]
 
 [build-system]

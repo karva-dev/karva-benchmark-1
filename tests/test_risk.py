@@ -2,8 +2,7 @@
 
 import math
 
-import karva
-from karva import fixture
+import pytest
 
 from finlib.risk import (
     volatility,
@@ -42,7 +41,7 @@ def test_volatility_annualized(sample_returns):
     assert abs(annual - daily * math.sqrt(252)) < 0.0001
 
 
-@karva.tags.parametrize("periods", [12, 52, 252, 365])
+@pytest.mark.parametrize("periods", [12, 52, 252, 365])
 def test_volatility_different_periods(sample_returns, periods: int):
     result = volatility(sample_returns, periods_per_year=periods)
     assert result > 0
@@ -62,7 +61,7 @@ def test_volatility_constant_returns():
     assert result == 0.0
 
 
-@karva.tags.parametrize("scale", [0.5, 1.0, 2.0, 5.0])
+@pytest.mark.parametrize("scale", [0.5, 1.0, 2.0, 5.0])
 def test_volatility_scales_with_returns(sample_returns, scale: float):
     scaled = [r * scale for r in sample_returns]
     vol_orig = volatility(sample_returns, annualize=False)
@@ -116,7 +115,7 @@ def test_beta_mismatched_lengths():
         pass
 
 
-@karva.tags.parametrize("multiplier", [0.5, 1.0, 1.5, 2.0])
+@pytest.mark.parametrize("multiplier", [0.5, 1.0, 1.5, 2.0])
 def test_beta_with_scaled_returns(sample_returns, market_returns, multiplier: float):
     scaled_asset = [r * multiplier for r in sample_returns]
     b = beta(scaled_asset, market_returns)
@@ -158,7 +157,7 @@ def test_sharpe_ratio_with_risk_free(sample_returns):
     assert isinstance(result, float)
 
 
-@karva.tags.parametrize("rf", [0.0, 0.0001, 0.001, 0.01])
+@pytest.mark.parametrize("rf", [0.0, 0.0001, 0.001, 0.01])
 def test_sharpe_with_various_risk_free(sample_returns, rf: float):
     result = sharpe_ratio(sample_returns, risk_free_rate=rf)
     assert isinstance(result, float)
@@ -216,11 +215,14 @@ def test_max_drawdown_decreasing_values():
     assert abs(result - 0.40) < 0.0001
 
 
-@karva.tags.parametrize("values,expected", [
-    ([100, 110, 90, 95, 80], 0.2727),  # 110 -> 80
-    ([100, 50, 75, 40, 60], 0.60),  # 100 -> 40
-    ([100, 120, 100, 110, 90], 0.25),  # 120 -> 90
-])
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        ([100, 110, 90, 95, 80], 0.2727),  # 110 -> 80
+        ([100, 50, 75, 40, 60], 0.60),  # 100 -> 40
+        ([100, 120, 100, 110, 90], 0.25),  # 120 -> 90
+    ],
+)
 def test_max_drawdown_specific(values: list, expected: float):
     result = max_drawdown(values)
     assert abs(result - expected) < 0.01
@@ -248,8 +250,8 @@ def test_drawdown_series_values():
     series = drawdown_series(values)
     assert series[0] == 0
     assert series[1] == 0
-    assert abs(series[2] - (120-100)/120) < 0.001
-    assert abs(series[3] - (120-80)/120) < 0.001
+    assert abs(series[2] - (120 - 100) / 120) < 0.001
+    assert abs(series[3] - (120 - 80) / 120) < 0.001
 
 
 # Calmar Ratio Tests
@@ -260,7 +262,7 @@ def test_calmar_ratio_basic(sample_returns, sample_portfolio_values):
 
 def test_calmar_ratio_no_drawdown():
     returns = [0.01] * 10
-    values = [100 * (1.01 ** i) for i in range(11)]
+    values = [100 * (1.01**i) for i in range(11)]
     result = calmar_ratio(returns, values)
     assert result == 0.0  # No drawdown
 
@@ -271,7 +273,7 @@ def test_parametric_var_basic(sample_returns):
     assert result > 0
 
 
-@karva.tags.parametrize("confidence", [0.90, 0.95, 0.99])
+@pytest.mark.parametrize("confidence", [0.90, 0.95, 0.99])
 def test_parametric_var_confidence_levels(sample_returns, confidence: float):
     result = parametric_var(sample_returns, confidence=confidence)
     assert result > 0
@@ -291,7 +293,7 @@ def test_parametric_var_with_holding_period(sample_returns):
     assert var_10 > var_1
 
 
-@karva.tags.parametrize("value", [1000, 10000, 100000])
+@pytest.mark.parametrize("value", [1000, 10000, 100000])
 def test_parametric_var_scales_with_portfolio(sample_returns, value: float):
     var_base = parametric_var(sample_returns, portfolio_value=1.0)
     var_scaled = parametric_var(sample_returns, portfolio_value=value)
@@ -304,7 +306,7 @@ def test_historical_var_basic(sample_returns):
     assert result >= 0
 
 
-@karva.tags.parametrize("confidence", [0.90, 0.95, 0.99])
+@pytest.mark.parametrize("confidence", [0.90, 0.95, 0.99])
 def test_historical_var_confidence_levels(large_returns, confidence: float):
     result = historical_var(large_returns, confidence=confidence)
     assert result >= 0
@@ -329,7 +331,7 @@ def test_cvar_greater_than_var(large_returns):
     assert cvar >= var
 
 
-@karva.tags.parametrize("confidence", [0.90, 0.95, 0.99])
+@pytest.mark.parametrize("confidence", [0.90, 0.95, 0.99])
 def test_conditional_var_confidence_levels(large_returns, confidence: float):
     result = conditional_var(large_returns, confidence=confidence)
     assert result >= 0
@@ -346,7 +348,7 @@ def test_component_var_basic():
     weights = [0.5, 0.5]
     returns = [
         [0.01, -0.02, 0.03, -0.01, 0.02, 0.01, -0.01, 0.02, -0.02, 0.01],
-        [-0.01, 0.02, -0.01, 0.02, -0.02, 0.01, 0.01, -0.01, 0.02, -0.01]
+        [-0.01, 0.02, -0.01, 0.02, -0.02, 0.01, 0.01, -0.01, 0.02, -0.01],
     ]
     result = component_var(weights, returns)
     assert len(result) == 2
@@ -373,8 +375,8 @@ def test_stress_test_basic():
     weights = [0.5, 0.3, 0.2]
     scenarios = [
         [-0.20, -0.10, -0.05],  # Market crash
-        [0.10, 0.05, 0.02],    # Rally
-        [-0.30, 0.05, 0.10],   # Sector rotation
+        [0.10, 0.05, 0.02],  # Rally
+        [-0.30, 0.05, 0.10],  # Sector rotation
     ]
     result = stress_test(100000, weights, scenarios)
     assert len(result) == 3
@@ -390,7 +392,7 @@ def test_stress_test_mismatched_scenario():
         pass
 
 
-@karva.tags.parametrize("value", [10000, 100000, 1000000])
+@pytest.mark.parametrize("value", [10000, 100000, 1000000])
 def test_stress_test_scales_with_portfolio(value: float):
     weights = [0.5, 0.5]
     scenarios = [[-0.20, -0.10]]
@@ -409,7 +411,7 @@ def test_upside_potential_ratio_basic(sample_returns):
 def test_upside_potential_ratio_only_upside():
     returns = [0.01, 0.02, 0.03, 0.01, 0.02]
     result = upside_potential_ratio(returns)
-    assert result == float('inf')
+    assert result == float("inf")
 
 
 def test_upside_potential_ratio_only_downside():
@@ -427,7 +429,7 @@ def test_omega_ratio_basic(sample_returns):
 def test_omega_ratio_all_gains():
     returns = [0.01, 0.02, 0.03]
     result = omega_ratio(returns)
-    assert result == float('inf')
+    assert result == float("inf")
 
 
 def test_omega_ratio_all_losses():
@@ -436,7 +438,7 @@ def test_omega_ratio_all_losses():
     assert abs(result) < 0.0001  # Should be 0
 
 
-@karva.tags.parametrize("threshold", [0.0, 0.005, 0.01])
+@pytest.mark.parametrize("threshold", [0.0, 0.005, 0.01])
 def test_omega_ratio_different_thresholds(sample_returns, threshold: float):
     result = omega_ratio(sample_returns, threshold=threshold)
     assert result >= 0
@@ -457,7 +459,7 @@ def test_gain_loss_ratio_no_gains():
 def test_gain_loss_ratio_no_losses():
     returns = [0.01, 0.02, 0.03]
     result = gain_loss_ratio(returns)
-    assert result == float('inf')
+    assert result == float("inf")
 
 
 def test_gain_loss_ratio_symmetric():

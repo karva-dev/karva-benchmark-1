@@ -3,7 +3,9 @@ name = "finlib"
 version = "0.1.0"
 description = "Financial Calculations Library for benchmarking test runners"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "pytest-cov>=7.1.0",
+]
 
 [dependency-groups]
 dev = [
